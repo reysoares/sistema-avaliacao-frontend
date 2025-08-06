@@ -1,0 +1,167 @@
+/* ========= TÍTULO ========= */
+.titulo-principal {
+  text-align: center;
+}
+
+/* ========= CONTAINER PRINCIPAL ========= */
+.perfil-container,
+.centralizado {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 40px;
+  padding: 30px 20px;
+  margin: 0 auto;
+  max-width: 900px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+}
+
+/* ========= COLUNA ESQUERDA (Foto e Email) ========= */
+.perfil-coluna-esquerda {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 220px;
+  text-align: center;
+}
+
+.foto-label {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.perfil-imagem,
+.perfil-imagem-label {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.perfil-imagem:hover,
+.perfil-imagem-label:hover,
+.perfil-imagem-label:focus {
+  transform: scale(1.05);
+  outline: 2px solid #555;
+}
+
+.perfil-email {
+  margin-top: 15px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.perfil-descricao-block {
+  margin-top: 20px;
+  padding: 0 10px;
+  font-size: 15px;
+  line-height: 1.5;
+  text-align: justify;
+  color: #444;
+}
+
+/* ========= COLUNA DIREITA (Informações) ========= */
+.perfil-coluna-direita {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 300px;
+  gap: 16px;
+  font-family: Helvetica, sans-serif;
+  font-size: 16px;
+  color: #333;
+}
+
+.perfil-info-pair {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 40px;
+  width: 100%;
+}
+
+.perfil-info-publica,
+.perfil-info-privada {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-width: 280px;
+  margin-top: 50px;
+}
+
+/* ========= Redimensionamento das Colunas ========= */
+.colunas-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+  width: 100%;
+}
+
+.coluna {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 40px;
+}
+
+.botao-privacidade-wrapper {
+  position: absolute;
+  top: 25px;
+  right: 25px;
+  text-align: right;
+  z-index: 10;
+}
+
+/* ========= Configurações do Botão de Privacidade ========= */
+
+.privacidade-canto-superior {
+  position: absolute;
+  top: 16px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.link-privacidade {
+  background: none;
+  border: none;
+  color: #333;
+  font-weight: 500;
+  font-size: inherit;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.privacidade-canto-superior:hover .link-privacidade,
+.privacidade-canto-superior:hover .descricao-privacidade {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

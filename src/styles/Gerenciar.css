@@ -1,0 +1,136 @@
+.gerenciar-cursos {
+  padding: 30px 20px;
+}
+
+.botao-adicionar {
+  background-color: #000;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.botao-adicionar:hover {
+  background-color: #00c853;
+}
+
+.botao-acoes {
+  background-color: #000;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+.botao-acoes:hover {
+  background-color: #00c853;
+}
+
+.acoes-superiores {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 25px;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  align-items: center;
+}
+
+
+.tabela-cursos table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Helvetica, sans-serif;
+}
+
+.tabela-cursos th,
+.tabela-cursos td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.tabela-cursos th {
+  background-color: #f5f5f5;
+  font-weight: bold;
+}
+
+.texto-vazio {
+  color: #555;
+  font-style: italic;
+  text-align: center;
+  width: 100%;
+}
+
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal {
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal input,
+.modal select {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.modal-botoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Estilização adicional para layout do formulário (disciplinas) */
+.form-gerenciamento {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-gerenciamento button {
+  grid-column: span 2;
+}
+
+.linha-selecionada {
+  background-color: #e0f7fa;
+}
+
+.botao-nao {
+  background-color: #ffffff;
+  color: #000000;
+  border: 2px solid #000000;
+}
+
+.botao-nao:hover {
+  background-color: #eeeeee;
+}

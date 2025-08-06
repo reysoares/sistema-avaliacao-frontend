@@ -1,0 +1,33 @@
+.dashboard-admin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.botoes-gerenciamento {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 30px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.botao-gerenciar {
+  padding: 16px;
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%;
+}
+
+.botao-gerenciar:hover {
+  background-color: #00c853; /* tom de verde vibrante */
+}
