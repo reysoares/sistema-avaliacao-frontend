@@ -1,51 +1,66 @@
 import React, { useState } from "react";
-import PerfilEdicaoBase from "../../layouts/PerfilEdicaoBase";
-import CampoEdicao from "../../utilitarios/CampoEdicao";
+import PerfilUserBase from "../../layouts/PerfilUserBase";
+import PerfilAdministradorEdicao from "./PerfilAdministradorEdicao";
 
-const PerfilAdministradorEdicao = ({ dados, onSalvar, onCancelar }) => {
-  const [form, setForm] = useState({ ...dados });
-  const [erroData, setErroData] = useState("");
+const PerfilAdministrador = ({
+  dadosPublicos = {
+    nome: "Nome não informado",
+    emailInstitucional: "email@exemplo.com",
+    perfil: "Administrador",
+    perfilDescricao: "Descrição não disponível.",
+    imagem: undefined,
+  },
+  dadosPrivados = {
+    dataNascimento: "Não informada",
+    matriculaAdministrativa: "Não informada",
+  },
+  isPrivate = true,
+  onSalvar = (novosDados) => {
+    console.log("Salvando...", novosDados);
+    alert("Dados atualizados com sucesso!");
+  },
+}) => {
+  const [modoEdicao, setModoEdicao] = useState(false);
 
-  const handleChange = (campo) => (e) => {
-    setForm({ ...form, [campo]: e.target.value });
-    if (campo === "dataNascimento") setErroData("");
-  };
-
-  const validarDataNascimento = (data) => {
-    if (!data) return "A data de nascimento é obrigatória.";
-    const hoje = new Date();
-    const nascimento = new Date(data);
-    const idade = hoje.getFullYear() - nascimento.getFullYear();
-    const aniversarioEsteAno = new Date(
-      hoje.getFullYear(),
-      nascimento.getMonth(),
-      nascimento.getDate()
+  if (modoEdicao) {
+    return (
+      <PerfilAdministradorEdicao
+        dados={{ ...dadosPublicos, ...dadosPrivados }}
+        onCancelar={() => setModoEdicao(false)}
+        onSalvar={(dadosAtualizados) => {
+          onSalvar(dadosAtualizados);
+          setModoEdicao(false);
+        }}
+      />
     );
-    const idadeFinal = aniversarioEsteAno > hoje ? idade - 1 : idade;
-    if (isNaN(nascimento.getTime())) return "Data inválida.";
-    if (idadeFinal < 18) return "Você deve ter pelo menos 18 anos.";
-    return "";
-  };
+  }
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const erro = validarDataNascimento(form.dataNascimento);
-    if (erro) {
-      setErroData(erro);
-      return;
-    }
-    onSalvar(form);
-  };
+  const informacoes = [
+    { label: "Nome", valor: dadosPublicos.nome },
+    { label: "Ocupação", valor: "Administrador" },
+    ...(isPrivate
+      ? [
+          { label: "Data de Nascimento", valor: dadosPrivados.dataNascimento },
+          {
+            label: "Matrícula Administrativa",
+            valor: dadosPrivados.matriculaAdministrativa,
+          },
+        ]
+      : []),
+  ];
 
   return (
-    <PerfilEdicaoBase
-      form={form}
-      onChange={handleChange}
-      onSubmit={handleSubmit}
-      onCancelar={onCancelar}
-      erroData={erroData}
-    ></PerfilEdicaoBase>
+    <PerfilUserBase
+      nome={dadosPublicos.nome}
+      emailInstitucional={dadosPublicos.emailInstitucional}
+      perfil={dadosPublicos.perfil}
+      imagem={dadosPublicos.imagem}
+      perfilDescricao={dadosPublicos.perfilDescricao}
+      informacoes={informacoes}
+      isPrivate={isPrivate}
+      onEditar={() => setModoEdicao(true)}
+    />
   );
 };
 
-export default PerfilAdministradorEdicao;
+export default PerfilAdministrador;

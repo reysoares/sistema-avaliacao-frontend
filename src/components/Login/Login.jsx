@@ -1,20 +1,33 @@
+// src/components/Login/Login.jsx
 import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import logo from "../../assets/avaliacaoLogo.svg";
+import { useAuth } from '../../hooks/useAuth.js';
 import fundo from "../../assets/fundo.png";
 import "@styles/FormularioBase.css";
-import { Link } from "react-router-dom";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-
+  const [matricula, setMatricula] = useState("");
+  const [senha, setSenha] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (event) => {
+  const { login } = useAuth(); // <-- Obtenha a função de login do contexto
+  
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    setError("");
+    setLoading(true);
 
-    console.log("Envio");
+    try {
+      await login(matricula, senha);
+    } catch (err) { // <-- A variável 'err'
+      console.error("Erro de login:", err); // <-- ADICIONE ESTA LINHA
+      setError("Matrícula ou senha inválida. Tente novamente.");
+      setLoading(false);
+    }
   };
 
   return (
@@ -31,9 +44,11 @@ const Login = () => {
           <div className="input-field">
             <FaUser className="icon-left" />
             <input
-              type="matricula"
+              type="text" // <-- Corrigido de "matricula" para "text"
               placeholder="Matrícula"
-              onChange={(e) => setUsername(e.target.value)}
+              value={matricula}
+              onChange={(e) => setMatricula(e.target.value)}
+              required
             />
           </div>
 
@@ -42,7 +57,9 @@ const Login = () => {
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Senha"
-              onChange={(e) => setPassword(e.target.value)}
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              required
             />
             {showPassword ? (
               <FaEyeSlash
@@ -61,9 +78,13 @@ const Login = () => {
             <Link to="/recuperar-conta">Esqueceu a senha ou usuário?</Link>
           </div>
 
-          <Link to="/inicial">
-            <button type="button">Entrar</button>
-          </Link>
+          {/* Exibe mensagem de erro se houver */}
+          {error && <p style={{ color: 'red', textAlign: 'center', marginBottom: '10px' }}>{error}</p>}
+          
+          {/* O botão agora é do tipo "submit" e não tem mais o Link */}
+          <button type="submit" disabled={loading}>
+            {loading ? 'Entrando...' : 'Entrar'}
+          </button>
 
           <div className="signup-link">
             <p>

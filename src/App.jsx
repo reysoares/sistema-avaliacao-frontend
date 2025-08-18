@@ -5,8 +5,8 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import Login from "./components/login/Login";
-import Cadastro from "./components/cadastro/Cadastro";
+import Login from "./components/Login/Login";
+import Cadastro from "./components/Cadastro/Cadastro";
 import RecuperarConta from "./components/recuperacao-de-conta/RecuperarConta";
 import PaginaInicial from "./components/paginas/PaginaInicial";
 import PaginaProfessores from "./components/paginas/PaginaProfessores";
@@ -17,33 +17,34 @@ import PerfilProfessor from "./components/pagina-perfil/professor/PerfilProfesso
 import PerfilAdministrador from "./components/pagina-perfil/administrador/PerfilAdministrador";
 import GerenciarCursos from "./components/Gerenciar/GerenciarCursos";
 import GerenciarDisciplinas from "./components/Gerenciar/GerenciarDisciplinas";
+import ProtectedRoute from "./components/utilitarios/ProtectedRoute";
+import { AuthProvider } from "./context/AuthProvider.jsx";
 
 function App() {
   return (
     <div className="App">
-      {" "}
-      {/* <-- adiciona essa div */}
       <Router>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/cadastro" element={<Cadastro />} />
-          <Route path="/recuperar-conta" element={<RecuperarConta />} />
-          <Route path="/inicial" element={<PaginaInicial />} />
-          <Route path="/professores" element={<PaginaProfessores />} />
-          <Route path="/disciplinas" element={<PaginaDisciplinas />} />
-          <Route path="/administrador/dashboard" element={<Dashboard />} />
-          <Route path="/administrador/cursos" element={<GerenciarCursos />} />
-          <Route path="/administrador/disciplinas" element={<GerenciarDisciplinas />} />
-          <Route path="/perfil/aluno" element={<PerfilAluno />} />
-          <Route path="/perfil/professor" element={<PerfilProfessor />} />
-          <Route
-            path="/perfil/administrador"
-            element={<PerfilAdministrador />}
-          />
-          <Route path="/" element={<Navigate to="/login" />} />{" "}
-          {/* redireciona root para login */}
-          <Route path="*" element={<Navigate to="/login" />} /> {/* fallback */}
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            {/* Rotas Públicas */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/cadastro" element={<Cadastro />} />
+            <Route path="/recuperar-conta" element={<RecuperarConta />} />
+
+            {/* Rotas Protegidas */}
+            <Route path="/inicial" element={<ProtectedRoute><PaginaInicial /></ProtectedRoute>} />
+            <Route path="/professores" element={<ProtectedRoute><PaginaProfessores /></ProtectedRoute>} />
+            <Route path="/disciplinas" element={<ProtectedRoute><PaginaDisciplinas /></ProtectedRoute>} />
+            <Route path="/administrador/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            {/* ... proteja as outras rotas da mesma forma ... */}
+            <Route path="/perfil/aluno" element={<ProtectedRoute><PerfilAluno /></ProtectedRoute>} />
+
+
+            {/* Redirecionamentos */}
+            <Route path="/" element={<Navigate to="/login" />} />
+            <Route path="*" element={<Navigate to="/login" />} />
+          </Routes>
+        </AuthProvider>
       </Router>
     </div>
   );
