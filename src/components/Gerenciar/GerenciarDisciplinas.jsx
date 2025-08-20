@@ -23,14 +23,12 @@ const GerenciarDisciplinas = () => {
     codigo: "", nome: "", semestre: "", descricao: "", cargaHoraria: "", professorId: "", cursoId: "",
   });
 
-  // ================================================================
-  // FUNÇÃO DE CARREGAMENTO ATUALIZADA (MESMA LÓGICA DO GERENCIAR CURSOS)
-  // ================================================================
+  
   const carregarDados = async () => {
     setLoading(true);
     setError("");
     try {
-        // Passo 1: Carrega os dados de suporte PRIMEIRO (cursos e professores)
+        
         const [resProfessores, resCursos] = await Promise.all([
             api.get("/public/professores"),
             api.get("/public/cursos")
@@ -38,12 +36,12 @@ const GerenciarDisciplinas = () => {
         setProfessores(resProfessores.data.content || []);
         setCursos(resCursos.data.content || []);
 
-        // Passo 2: Carrega as disciplinas. Se falhar, não é um erro fatal para o formulário.
+        
         try {
             const resDisciplinas = await disciplinaService.getAll();
             setDisciplinas(resDisciplinas.content || []);
         } catch (disciplinaError) {
-            // Se o erro for "Nenhuma disciplina encontrada", é um estado normal.
+            
             if (disciplinaError.response?.data?.message === 'Nenhuma disciplina encontrada.') {
                 setDisciplinas([]); // Apenas garante que a lista fique vazia.
             } else {

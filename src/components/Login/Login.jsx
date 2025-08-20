@@ -24,7 +24,7 @@ const Login = () => {
     try {
       await login(matricula, senha);
     } catch (err) { // <-- A variável 'err'
-      console.error("Erro de login:", err); // <-- ADICIONE ESTA LINHA
+      console.error("Erro de login:", err);
       setError("Matrícula ou senha inválida. Tente novamente.");
       setLoading(false);
     }
@@ -44,7 +44,7 @@ const Login = () => {
           <div className="input-field">
             <FaUser className="icon-left" />
             <input
-              type="text" // <-- Corrigido de "matricula" para "text"
+              type="text" 
               placeholder="Matrícula"
               value={matricula}
               onChange={(e) => setMatricula(e.target.value)}
@@ -81,7 +81,7 @@ const Login = () => {
           {/* Exibe mensagem de erro se houver */}
           {error && <p style={{ color: 'red', textAlign: 'center', marginBottom: '10px' }}>{error}</p>}
           
-          {/* O botão agora é do tipo "submit" e não tem mais o Link */}
+          
           <button type="submit" disabled={loading}>
             {loading ? 'Entrando...' : 'Entrar'}
           </button>

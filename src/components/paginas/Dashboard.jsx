@@ -1,8 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import PaginaBase from "../layouts/PaginaBase";
-import "@styles/Dashboard.css"; // novo arquivo que você pode criar para estilizar essa página
-
+import "@styles/Dashboard.css"; 
 const Dashboard = () => {
   return (
     <PaginaBase

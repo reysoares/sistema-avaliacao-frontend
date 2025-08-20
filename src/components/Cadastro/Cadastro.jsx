@@ -72,7 +72,6 @@ const Cadastro = () => {
           <img src={logo} alt="Logo" />
           <h1>Cadastro</h1>
 
-          {/* Campos do formulário (iguais aos que você já tinha) */}
           <div className="input-field">
             <FaUser className="icon-left" />
             <input type="text" placeholder="Nome completo" required onChange={(e) => setNome(e.target.value)} />
