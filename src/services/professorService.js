@@ -1,16 +1,13 @@
-// src/services/professorService.js (VERSÃO ATUALIZADA)
+// src/services/professorService.js 
 
 import api from '../api/axios';
-import apiPrivate from '../api/apiPrivate'; // Importamos a API privada
+import apiPrivate from '../api/apiPrivate'; 
 
 const getAll = async () => {
   const response = await api.get('/public/professores');
   return response.data;
 };
 
-// ================================================================
-// FUNÇÕES DE UPDATE ADICIONADAS
-// ================================================================
 
 // Atualiza os dados de texto do professor
 const update = async (matricula, professorData) => {

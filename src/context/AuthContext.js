@@ -1,4 +1,4 @@
-// src/context/AuthContext.js (NOVO ARQUIVO)
+// src/context/AuthContext.js
 
 import { createContext } from 'react';
 

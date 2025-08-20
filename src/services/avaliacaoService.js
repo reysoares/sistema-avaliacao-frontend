@@ -18,9 +18,7 @@ const getByDisciplina = async (codigoDisciplina) => {
     return response.data;
 };
 
-// ================================================================
-// NOVA FUNÇÃO PARA BUSCAR AVALIAÇÕES DE UM PROFESSOR
-// ================================================================
+
 const getByProfessor = async (matriculaProfessor) => {
     const response = await api.get(`/public/professor/avaliacoes/${matriculaProfessor}`);
     return response.data;
@@ -30,7 +28,7 @@ const avaliacaoService = {
   criarAvaliacaoDisciplina,
   criarAvaliacaoProfessor,
   getByDisciplina,
-  getByProfessor, // <-- Adicionada
+  getByProfessor, 
 };
 
 export default avaliacaoService;

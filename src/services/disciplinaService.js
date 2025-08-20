@@ -1,4 +1,4 @@
-// src/services/disciplinaService.js (VERSÃO ATUALIZADA)
+// src/services/disciplinaService.js 
 
 import api from '../api/axios';
 import apiPrivate from '../api/apiPrivate';
@@ -13,9 +13,6 @@ const create = async (disciplinaData) => {
   return response.data;
 };
 
-// ================================================================
-// FUNÇÕES ADICIONADAS
-// ================================================================
 
 const update = async (codigo, disciplinaData, cursoId, professorMatricula) => {
     // A URL de update do backend é bastante complexa, vamos montá-la

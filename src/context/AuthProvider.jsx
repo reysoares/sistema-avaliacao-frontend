@@ -1,4 +1,4 @@
-// src/context/AuthProvider.jsx (VERSÃO ATUALIZADA)
+// src/context/AuthProvider.jsx 
 
 import React, { useState, useEffect } from 'react';
 import authService from '../services/authService';
@@ -18,29 +18,29 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (e) {
       console.error("Falha ao carregar dados do usuário", e);
-      setUser(null); // Garante que o estado fique limpo se houver erro
+      setUser(null); 
     } finally {
-      setLoading(false); // <-- Termina o carregamento, com ou sem usuário
+      setLoading(false); 
     }
   }, []);
 
   const login = async (matricula, senha) => {
-    // ... (a função de login continua exatamente a mesma)
+    
     const userData = await authService.login(matricula, senha);
     setUser(userData);
     navigate('/inicial');
   };
 
   const logout = () => {
-    // ... (a função de logout continua exatamente a mesma)
+    
     authService.logout();
     setUser(null);
     navigate('/login');
   };
 
-  const value = { user, loading, login, logout }; // <-- Adiciona 'loading' ao valor do contexto
+  const value = { user, loading, login, logout }; 
 
-  // Se ainda estiver carregando, não renderiza o resto da aplicação ainda
+  
   if (loading) {
     return <div>Carregando aplicação...</div>;
   }
