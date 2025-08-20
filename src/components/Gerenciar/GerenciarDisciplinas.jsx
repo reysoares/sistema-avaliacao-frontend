@@ -1,4 +1,4 @@
-// src/components/Gerenciar/GerenciarDisciplinas.jsx (VERSÃO 100% COMPLETA)
+// src/components/Gerenciar/GerenciarDisciplinas.jsx (VERSÃO FINAL COM LÓGICA DE CARREGAMENTO CORRIGIDA)
 
 import React, { useState, useEffect } from "react";
 import PaginaBase from "../layouts/PaginaBase";
@@ -23,23 +23,40 @@ const GerenciarDisciplinas = () => {
     codigo: "", nome: "", semestre: "", descricao: "", cargaHoraria: "", professorId: "", cursoId: "",
   });
 
+  // ================================================================
+  // FUNÇÃO DE CARREGAMENTO ATUALIZADA (MESMA LÓGICA DO GERENCIAR CURSOS)
+  // ================================================================
   const carregarDados = async () => {
     setLoading(true);
     setError("");
     try {
-      const [resDisciplinas, resProfessores, resCursos] = await Promise.all([
-        disciplinaService.getAll(),
-        api.get("/public/professores"),
-        api.get("/public/cursos")
-      ]);
-      setDisciplinas(resDisciplinas.content || []);
-      setProfessores(resProfessores.data.content || []);
-      setCursos(resCursos.data.content || []);
+        // Passo 1: Carrega os dados de suporte PRIMEIRO (cursos e professores)
+        const [resProfessores, resCursos] = await Promise.all([
+            api.get("/public/professores"),
+            api.get("/public/cursos")
+        ]);
+        setProfessores(resProfessores.data.content || []);
+        setCursos(resCursos.data.content || []);
+
+        // Passo 2: Carrega as disciplinas. Se falhar, não é um erro fatal para o formulário.
+        try {
+            const resDisciplinas = await disciplinaService.getAll();
+            setDisciplinas(resDisciplinas.content || []);
+        } catch (disciplinaError) {
+            // Se o erro for "Nenhuma disciplina encontrada", é um estado normal.
+            if (disciplinaError.response?.data?.message === 'Nenhuma disciplina encontrada.') {
+                setDisciplinas([]); // Apenas garante que a lista fique vazia.
+            } else {
+                throw disciplinaError; // Lança outros erros inesperados para o catch principal.
+            }
+        }
+
     } catch (err) {
-      setError("Falha ao carregar dados. Tente atualizar a página.");
-      console.error(err);
+        // Este catch agora irá capturar principalmente erros ao carregar professores/cursos.
+        setError("Falha ao carregar dados de suporte (professores/cursos).");
+        console.error(err);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
   };
 
@@ -158,10 +175,10 @@ const GerenciarDisciplinas = () => {
         </div>
 
         {loading && <p>Carregando...</p>}
-        {error && !showModal && <p style={{color: 'red', textAlign: 'center', margin: '10px 0'}}>{error}</p>}
+        {error && !showModal && !showConfirmarExclusao && <p style={{color: 'red', textAlign: 'center', margin: '10px 0'}}>{error}</p>}
 
         <div className="tabela-cursos">
-          {disciplinas.length === 0 && !loading ? (
+          {!loading && disciplinas.length === 0 ? (
             <p className="texto-vazio">Nenhuma disciplina cadastrada.</p>
           ) : (
             <table>
@@ -215,7 +232,7 @@ const GerenciarDisciplinas = () => {
               </select>
               {error && <p style={{color: 'red'}}>{error}</p>}
               <div className="modal-botoes">
-                <button onClick={() => setShowModal(false)}>Cancelar</button>
+                <button className="botao-nao" onClick={() => setShowModal(false)}>Cancelar</button>
                 <button onClick={handleSalvar} disabled={loading}>{loading ? 'Salvando...' : 'Salvar'}</button>
               </div>
             </div>
