@@ -1,67 +1,82 @@
-import React, { useState } from "react";
+// src/components/pagina-perfil/professor/PerfilProfessorEdicao.jsx (VERSÃO ATUALIZADA)
+
+import React, { useState, useRef } from "react";
 import PerfilEdicaoBase from "../../layouts/PerfilEdicaoBase";
 import CampoEdicao from "../../utilitarios/CampoEdicao";
+import professorService from "../../../services/professorService";
+import fotoAnonima from "../../../assets/fotoAnonima.png";
 
 const PerfilProfessorEdicao = ({ dados, onSalvar, onCancelar }) => {
-  const [form, setForm] = useState({ ...dados });
-  const [erroData, setErroData] = useState("");
+  const [formData, setFormData] = useState({
+    nome: dados.nome || "",
+    descricao: dados.descricao || "",
+    dataNascimento: dados.dataNascimento?.split('T')[0] || "",
+    emailInstitucional: dados.emailInstitucional || "",
+    departamento: dados.departamento || "",
+    unidadeEnsino: dados.unidadeEnsino || "",
+    areaAtuacao: dados.areaAtuacao || "",
+  });
+  
+  const [imagemFile, setImagemFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(dados.imagem || fotoAnonima);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const fileInputRef = useRef(null);
 
   const handleChange = (campo) => (e) => {
-    setForm({ ...form, [campo]: e.target.value });
-    if (campo === "dataNascimento") setErroData("");
+    setFormData({ ...formData, [campo]: e.target.value });
   };
 
-  const validarDataNascimento = (data) => {
-    if (!data) return "A data de nascimento é obrigatória.";
-    const hoje = new Date();
-    const nascimento = new Date(data);
-    const idade = hoje.getFullYear() - nascimento.getFullYear();
-    const aniversarioEsteAno = new Date(
-      hoje.getFullYear(),
-      nascimento.getMonth(),
-      nascimento.getDate()
-    );
-    const idadeFinal = aniversarioEsteAno > hoje ? idade - 1 : idade;
-    if (isNaN(nascimento.getTime())) return "Data inválida.";
-    if (idadeFinal < 18) return "Você deve ter pelo menos 18 anos.";
-    return "";
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const erro = validarDataNascimento(form.dataNascimento);
-    if (erro) {
-      setErroData(erro);
-      return;
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImagemFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
     }
-    onSalvar(form);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      await professorService.update(dados.matriculaFuncional, formData);
+      if (imagemFile) {
+        await professorService.updateImagem(dados.matriculaFuncional, imagemFile);
+      }
+      alert("Perfil atualizado com sucesso!");
+      onSalvar();
+    } catch (err) {
+      setError("Erro ao salvar o perfil. Tente novamente.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <PerfilEdicaoBase
-      form={form}
+      form={{ ...formData, imagem: previewUrl }}
       onChange={handleChange}
       onSubmit={handleSubmit}
       onCancelar={onCancelar}
-      erroData={erroData}
+      loading={loading} // <-- PASSANDO A PROPRIEDADE AQUI
     >
-      <CampoEdicao
-        label="Departamento"
-        valor={form.departamento}
-        onChange={handleChange("departamento")}
-        required
+      <input 
+        type="file" 
+        accept="image/*"
+        style={{ display: 'none' }} 
+        ref={fileInputRef} 
+        onChange={handleImageChange}
       />
-      <CampoEdicao
-        label="Unidade de Ensino"
-        valor={form.unidadeEnsino}
-        onChange={handleChange("unidadeEnsino")}
-        required
-      />
-      <CampoEdicao
-        label="Área de Atuação"
-        valor={form.areaAtuacao}
-        onChange={handleChange("areaAtuacao")}
-      />
+      <button type="button" className="botao-editar" style={{marginBottom: '20px'}} onClick={() => fileInputRef.current.click()}>
+        Alterar Foto
+      </button>
+      <CampoEdicao label="Departamento" valor={formData.departamento} onChange={handleChange("departamento")} />
+      <CampoEdicao label="Unidade de Ensino" valor={formData.unidadeEnsino} onChange={handleChange("unidadeEnsino")} />
+      <CampoEdicao label="Área de Atuação" valor={formData.areaAtuacao} onChange={handleChange("areaAtuacao")} />
+      
+      {error && <p style={{color: 'red', marginTop: '10px'}}>{error}</p>}
     </PerfilEdicaoBase>
   );
 };

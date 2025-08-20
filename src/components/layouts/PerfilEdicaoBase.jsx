@@ -1,3 +1,5 @@
+// src/components/layouts/PerfilEdicaoBase.jsx (VERSÃO 100% COMPLETA)
+
 import React from "react";
 import PaginaBase from "../layouts/PaginaBase";
 import fotoAnonima from "../../assets/fotoAnonima.png";
@@ -11,10 +13,10 @@ const PerfilEdicaoBase = ({
   onCancelar,
   erroData,
   children,
+  loading,
 }) => {
   return (
     <PaginaBase
-      navLinks={[]}
       botaoDireito={
         <button className="botao-cancelar" onClick={onCancelar}>
           Cancelar
@@ -24,7 +26,6 @@ const PerfilEdicaoBase = ({
       <h1 className="titulo-principal">Editar Perfil</h1>
 
       <div className="perfil-container">
-        {/* Coluna da foto */}
         <div className="perfil-coluna-esquerda">
           <p className="foto-label">Foto de perfil</p>
           <img
@@ -34,7 +35,6 @@ const PerfilEdicaoBase = ({
           />
         </div>
 
-        {/* Formulário */}
         <form className="perfil-coluna-direita" onSubmit={onSubmit}>
           <CampoEdicao
             label="Nome completo"
@@ -42,12 +42,7 @@ const PerfilEdicaoBase = ({
             onChange={onChange("nome")}
             required
           />
-          <CampoEdicao
-            label="Descrição"
-            valor={form.perfilDescricao}
-            onChange={onChange("perfilDescricao")}
-            tipo="textarea"
-          />
+    
           <CampoEdicao
             label="Data de nascimento"
             valor={form.dataNascimento}
@@ -64,7 +59,7 @@ const PerfilEdicaoBase = ({
             required
           />
 
-          {/* Campos específicos do tipo de usuário */}
+          {/* Campos específicos do tipo de usuário (ex: departamento) */}
           {children}
 
           <div className="botoes-acoes-wrapper">
@@ -75,8 +70,8 @@ const PerfilEdicaoBase = ({
             >
               Cancelar
             </button>
-            <button type="submit" className="botao-editar">
-              Salvar Alterações
+            <button type="submit" className="botao-editar" disabled={loading}>
+              {loading ? 'Salvando...' : 'Salvar Alterações'}
             </button>
           </div>
         </form>

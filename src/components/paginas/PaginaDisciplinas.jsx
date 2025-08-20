@@ -146,22 +146,42 @@ const PaginaDisciplinas = () => {
                     <div className="modal-overlay">
                         <div className="modal">
                             <h2>Avaliar: {disciplinaParaAvaliar?.nome}</h2>
-                            <label>Nota para o Conteúdo (1-5): {formData.notaConteudo}</label>
-                            <input type="range" min="1" max="5" name="notaConteudo" value={formData.notaConteudo} onChange={handleChange} />
-                            
-                            <label>Nota para Carga de Trabalho (1-5): {formData.notaCargaTrabalho}</label>
-                            <input type="range" min="1" max="5" name="notaCargaTrabalho" value={formData.notaCargaTrabalho} onChange={handleChange} />
 
-                            <label>Nota para Infraestrutura (1-5): {formData.notaInfraestrutura}</label>
-                            <input type="range" min="1" max="5" name="notaInfraestrutura" value={formData.notaInfraestrutura} onChange={handleChange} />
+                            <div className="avaliacao-form">
+                                <div className="form-group">
+                                    <div className="slider-label">
+                                        <span>Nota para o Conteúdo (1-5):</span>
+                                        <span className="slider-value">{formData.notaConteudo}</span>
+                                    </div>
+                                    <input type="range" min="1" max="5" name="notaConteudo" value={formData.notaConteudo} onChange={handleChange} />
+                                </div>
 
-                            <label>Comentário:</label>
-                            <textarea name="comentario" value={formData.comentario} onChange={handleChange} rows="4" />
+                                <div className="form-group">
+                                    <div className="slider-label">
+                                        <span>Nota para Carga de Trabalho (1-5):</span>
+                                        <span className="slider-value">{formData.notaCargaTrabalho}</span>
+                                    </div>
+                                    <input type="range" min="1" max="5" name="notaCargaTrabalho" value={formData.notaCargaTrabalho} onChange={handleChange} />
+                                </div>
+
+                                <div className="form-group">
+                                    <div className="slider-label">
+                                        <span>Nota para Infraestrutura (1-5):</span>
+                                        <span className="slider-value">{formData.notaInfraestrutura}</span>
+                                    </div>
+                                    <input type="range" min="1" max="5" name="notaInfraestrutura" value={formData.notaInfraestrutura} onChange={handleChange} />
+                                </div>
+                                
+                                <div className="form-group">
+                                    <label>Comentário:</label>
+                                    <textarea name="comentario" value={formData.comentario} onChange={handleChange} rows="4" placeholder="Deixe um comentário construtivo..." />
+                                </div>
+                            </div>
 
                             {error && <p style={{color: 'red'}}>{error}</p>}
                             
                             <div className="modal-botoes">
-                                <button onClick={() => setShowAvaliarModal(false)}>Cancelar</button>
+                                <button className="botao-nao" onClick={() => setShowAvaliarModal(false)}>Cancelar</button>
                                 <button onClick={handleSalvarAvaliacao} disabled={loading}>{loading ? 'Enviando...' : 'Enviar Avaliação'}</button>
                             </div>
                         </div>
