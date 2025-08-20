@@ -1,62 +1,74 @@
+// src/components/layouts/PaginaBase.jsx (VERSÃO 100% COMPLETA)
+
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth.js";
 import logo from "../../assets/avaliacaoLogo.svg";
 import "@styles/PaginaBase.css";
 
 const PaginaBase = ({ children, botaoDireito }) => {
   const location = useLocation();
-  const tipoUsuario = "Administrador";
+  const { user } = useAuth();
 
+  const tipoUsuario = user?.usuario.perfil;
+  
   const rotaPerfil = (() => {
     switch (tipoUsuario) {
-      case "Professor":
+      case "PROFESSOR":
         return "/perfil/professor";
-      case "Administrador":
+      case "ADMINISTRADOR":
         return "/perfil/administrador";
-      default:
+      case "ALUNO":
         return "/perfil/aluno";
+      default:
+        return "/login"; // Se não houver usuário, o link de perfil leva ao login
     }
   })();
 
   const todosLinks = [];
 
-  if (tipoUsuario === "Administrador") {
+  // Só mostra o link do Dashboard se o usuário for Administrador
+  if (tipoUsuario === "ADMINISTRADOR") {
     todosLinks.push({ to: "/administrador/dashboard", label: "Dashboard" });
   }
 
-  todosLinks.push(
-    { to: "/disciplinas", label: "Disciplinas" },
-    { to: "/professores", label: "Professores" },
-    { to: rotaPerfil, label: "Perfil" }
-  );
+  // Links visíveis para todos os usuários logados
+  if (user) {
+    todosLinks.push(
+      { to: "/disciplinas", label: "Disciplinas" },
+      { to: "/professores", label: "Professores" },
+      { to: rotaPerfil, label: "Perfil" }
+    );
+  }
 
+  // Filtra o link da página atual para não aparecer na navbar
   const navLinks = todosLinks.filter(
     (link) => !location.pathname.startsWith(link.to)
   );
 
   return (
     <div className="pagina-base">
-      {/* Cabeçalho / Navbar */}
       <nav className="navbar">
         <div className="navbar-left">
           <img src={logo} alt="Logo" className="logo" />
           <span className="titulo-sistema">Sistema de Avaliação</span>
         </div>
-
-        <div className="navbar-right">
-          {navLinks.map((link, index) => (
-            <Link key={index} to={link.to} className="nav-link">
-              {link.label}
-            </Link>
-          ))}
-          {botaoDireito}
-        </div>
+        
+        {/* Renderiza a parte direita da navbar apenas se houver um usuário logado */}
+        {user && (
+          <div className="navbar-right">
+            {navLinks.map((link, index) => (
+              <Link key={index} to={link.to} className="nav-link">
+                {link.label}
+              </Link>
+            ))}
+            {botaoDireito}
+          </div>
+        )}
       </nav>
 
-      {/* Conteúdo principal */}
       <main className="conteudo-inicial">{children}</main>
 
-      {/* Rodapé */}
       <footer className="footer">
         <div className="footer-content">
           <img src={logo} alt="Logo" className="logo-footer" />
