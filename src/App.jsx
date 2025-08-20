@@ -1,3 +1,5 @@
+// App.jsx (VERSÃO ATUALIZADA)
+
 import "./App.css";
 import {
   BrowserRouter as Router,
@@ -36,8 +38,20 @@ function App() {
             <Route path="/professores" element={<ProtectedRoute><PaginaProfessores /></ProtectedRoute>} />
             <Route path="/disciplinas" element={<ProtectedRoute><PaginaDisciplinas /></ProtectedRoute>} />
             <Route path="/administrador/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            {/* ... proteja as outras rotas da mesma forma ... */}
+            
+            {/* Rotas de Gerenciamento do Administrador */}
+            <Route path="/administrador/cursos" element={<ProtectedRoute><GerenciarCursos /></ProtectedRoute>} />
+            
+            {/* ================================================================ */}
+            {/* ROTA ADICIONADA AQUI */}
+            {/* ================================================================ */}
+            <Route path="/administrador/disciplinas" element={<ProtectedRoute><GerenciarDisciplinas /></ProtectedRoute>} />
+
+
+            {/* Rotas de Perfil */}
             <Route path="/perfil/aluno" element={<ProtectedRoute><PerfilAluno /></ProtectedRoute>} />
+            <Route path="/perfil/professor" element={<ProtectedRoute><PerfilProfessor /></ProtectedRoute>} />
+            <Route path="/perfil/administrador" element={<ProtectedRoute><PerfilAdministrador /></ProtectedRoute>} />
 
 
             {/* Redirecionamentos */}

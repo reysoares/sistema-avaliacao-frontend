@@ -1,6 +1,9 @@
+// src/components/Gerenciar/GerenciarCursos.jsx (VERSÃO 100% COMPLETA E CORRIGIDA)
+
 import React, { useState, useEffect } from "react";
 import PaginaBase from "../layouts/PaginaBase";
-import api from "../../api/axios"; // <-- usa o axios criado
+import cursoService from "../../services/cursoService";
+import api from "../../api/axios";
 import "@styles/Gerenciar.css";
 
 const GerenciarCursos = () => {
@@ -8,134 +11,133 @@ const GerenciarCursos = () => {
   const [professores, setProfessores] = useState([]);
 
   const [showModal, setShowModal] = useState(false);
-  const [editando, setEditando] = useState(false);
-  const [confirmarExclusao, setConfirmarExclusao] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  
   const [cursoSelecionado, setCursoSelecionado] = useState(null);
+  const [showConfirmarExclusao, setShowConfirmarExclusao] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
-  const [novoCurso, setNovoCurso] = useState({ nome: "", coordenadorId: "" });
+  const [formData, setFormData] = useState({ nome: "", coordenadorId: "" });
 
-  // Carregar cursos
-  const carregarCursos = async () => {
+  const carregarDados = async () => {
+    setLoading(true);
+    setError("");
     try {
-      const res = await api.get("/cursos");
-      setCursos(res.data);
+        const [resCursos, resProfessores] = await Promise.all([
+            cursoService.getAll(),
+            api.get("/public/professores")
+        ]);
+        setCursos(resCursos.content || []);
+        setProfessores(resProfessores.data.content || []);
     } catch (err) {
-      console.error("Erro ao buscar cursos:", err);
-    }
-  };
-
-  // Carregar professores
-  const carregarProfessores = async () => {
-    try {
-      const res = await api.get("/professores");
-      setProfessores(res.data);
-    } catch (err) {
-      console.error("Erro ao buscar professores:", err);
+        console.error("Erro ao carregar dados:", err);
+        setError("Não foi possível carregar os dados. Tente novamente.");
+    } finally {
+        setLoading(false);
     }
   };
 
   useEffect(() => {
-    carregarCursos();
-    carregarProfessores();
+    carregarDados();
   }, []);
 
-  const handleAdicionar = () => {
-    setNovoCurso({ nome: "", coordenadorId: "" });
-    setEditando(false);
-    setShowModal(true);
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSalvar = async () => {
-    const body = {
-      nome: novoCurso.nome,
-      coordenador: { id: parseInt(novoCurso.coordenadorId) },
-    };
-
-    try {
-      if (editando && cursoSelecionado) {
-        await api.put(`/cursos/${cursoSelecionado.id}`, body);
-      } else {
-        await api.post("/cursos", body);
-      }
-
-      await carregarCursos();
-      setShowModal(false);
-      setCursoSelecionado(null);
-    } catch (err) {
-      console.error("Erro ao salvar curso:", err);
-      alert("Erro ao salvar curso.");
-    }
+  const handleAdicionar = () => {
+    setIsEditing(false);
+    setFormData({ nome: "", coordenadorId: "" });
+    setError("");
+    setShowModal(true);
   };
 
   const handleEditar = () => {
     if (!cursoSelecionado) {
-      alert("Selecione um curso para editar.");
+      alert("Por favor, selecione um curso para editar.");
       return;
     }
-
-    setNovoCurso({
+    setIsEditing(true);
+    setFormData({
       nome: cursoSelecionado.nome,
       coordenadorId: cursoSelecionado.coordenador?.id || "",
     });
-    setEditando(true);
+    setError("");
     setShowModal(true);
   };
 
   const handleExcluir = () => {
     if (!cursoSelecionado) {
-      alert("Selecione um curso para excluir.");
+      alert("Por favor, selecione um curso para excluir.");
       return;
     }
-
-    setConfirmarExclusao(true);
+    setError("");
+    setShowConfirmarExclusao(true);
   };
 
-  const confirmarRemocao = async () => {
+  const confirmarExclusao = async () => {
+    setLoading(true);
+    setError("");
     try {
-      await api.delete(`/cursos/${cursoSelecionado.id}`);
-      await carregarCursos();
-      setConfirmarExclusao(false);
+      await cursoService.deleteById(cursoSelecionado.id);
+      setShowConfirmarExclusao(false);
       setCursoSelecionado(null);
+      await carregarDados();
     } catch (err) {
-      console.error("Erro ao excluir curso:", err);
-      alert("Erro ao excluir curso.");
+      setError("Erro ao excluir o curso.");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNovoCurso((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const selecionarCurso = (curso) => {
-    setCursoSelecionado(cursoSelecionado?.id === curso.id ? null : curso);
+  
+  const handleSalvar = async () => {
+    setError("");
+    if (!formData.nome || !formData.coordenadorId) {
+        setError("Nome do curso e coordenador são obrigatórios.");
+        return;
+    }
+    
+    setLoading(true);
+    try {
+      if (isEditing) {
+        const coordenadorSelecionado = professores.find(p => p.id === parseInt(formData.coordenadorId));
+        if (!coordenadorSelecionado) {
+            throw new Error("Coordenador não encontrado na lista.");
+        }
+        await cursoService.update(cursoSelecionado.id, formData, coordenadorSelecionado.matriculaFuncional);
+      } else {
+        await cursoService.create(formData);
+      }
+      setShowModal(false);
+      setCursoSelecionado(null);
+      await carregarDados();
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || `Erro ao salvar o curso.`;
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <PaginaBase
-      botaoDireito={
-        <button onClick={() => window.history.back()} className="botao-navbar">
-          Voltar
-        </button>
-      }
-    >
+    <PaginaBase botaoDireito={<button onClick={() => window.history.back()} className="botao-navbar">Voltar</button>}>
       <div className="gerenciar-cursos">
         <h1 className="titulo-principal">Gerenciar Cursos</h1>
 
         <div className="acoes-superiores">
-          <button className="botao-adicionar" onClick={handleAdicionar}>
-            + Adicionar Curso
-          </button>
-          <button className="botao-editar" onClick={handleEditar}>
-            Editar Curso
-          </button>
-          <button className="botao-excluir" onClick={handleExcluir}>
-            Excluir Curso
-          </button>
+          <button className="botao-adicionar" onClick={handleAdicionar}>+ Adicionar</button>
+          <button className="botao-editar" onClick={handleEditar}>Editar</button>
+          <button className="botao-excluir" onClick={handleExcluir}>Excluir</button>
         </div>
 
+        {loading && <p>Carregando...</p>}
+        {error && !showModal && !showConfirmarExclusao && <p style={{ color: "red", textAlign: "center", margin: "10px 0" }}>{error}</p>}
+
         <div className="tabela-cursos">
-          {cursos.length === 0 ? (
+          {!loading && cursos.length === 0 ? (
             <p className="texto-vazio">Nenhum curso cadastrado.</p>
           ) : (
             <table>
@@ -150,10 +152,8 @@ const GerenciarCursos = () => {
                 {cursos.map((curso) => (
                   <tr
                     key={curso.id}
-                    className={
-                      cursoSelecionado?.id === curso.id ? "linha-selecionada" : ""
-                    }
-                    onClick={() => selecionarCurso(curso)}
+                    className={cursoSelecionado?.id === curso.id ? "linha-selecionada" : ""}
+                    onClick={() => setCursoSelecionado(curso)}
                   >
                     <td>{curso.id}</td>
                     <td>{curso.nome}</td>
@@ -165,61 +165,38 @@ const GerenciarCursos = () => {
           )}
         </div>
 
-        {/* Modal Adicionar/Editar */}
         {showModal && (
           <div className="modal-overlay">
             <div className="modal">
-              <h2>{editando ? "Editar Curso" : "Novo Curso"}</h2>
-
+              <h2>{isEditing ? "Editar Curso" : "Novo Curso"}</h2>
               <label>Nome do curso:</label>
-              <input
-                type="text"
-                name="nome"
-                value={novoCurso.nome}
-                onChange={handleInputChange}
-              />
-
+              <input type="text" name="nome" value={formData.nome} onChange={handleInputChange}/>
               <label>Coordenador:</label>
-              <select
-                name="coordenadorId"
-                value={novoCurso.coordenadorId}
-                onChange={handleInputChange}
-              >
-                <option value="">Selecione</option>
-                {professores.map((prof) => (
-                  <option key={prof.id} value={prof.id}>
-                    {prof.nome}
-                  </option>
-                ))}
+              <select name="coordenadorId" value={formData.coordenadorId} onChange={handleInputChange}>
+                <option value="">Selecione um coordenador</option>
+                {professores.map((prof) => <option key={prof.id} value={prof.id}>{prof.nome}</option>)}
               </select>
-
+              {error && <p style={{ color: "red" }}>{error}</p>}
               <div className="modal-botoes">
-                <button onClick={() => setShowModal(false)}>Cancelar</button>
-                <button onClick={handleSalvar}>Salvar</button>
+                <button className="botao-nao" onClick={() => setShowModal(false)}>Cancelar</button>
+                <button onClick={handleSalvar} disabled={loading}>{loading ? "Salvando..." : "Salvar"}</button>
               </div>
             </div>
           </div>
         )}
 
-        {/* Modal Confirmação de Exclusão */}
-        {confirmarExclusao && (
-          <div className="modal-overlay">
-            <div className="modal">
-              <h3>Deseja realmente excluir o curso:</h3>
-              <p>
-                <strong>{cursoSelecionado?.nome}</strong>?
-              </p>
-              <div className="modal-botoes">
-                <button
-                  onClick={() => setConfirmarExclusao(false)}
-                  className="botao-nao"
-                >
-                  Não
-                </button>
-                <button onClick={confirmarRemocao}>Sim</button>
-              </div>
+        {showConfirmarExclusao && (
+            <div className="modal-overlay">
+                <div className="modal">
+                    <h3>Confirmar Exclusão</h3>
+                    <p>Você tem certeza que deseja excluir o curso <strong>{cursoSelecionado?.nome}</strong>?</p>
+                    {error && <p style={{ color: "red" }}>{error}</p>}
+                    <div className="modal-botoes">
+                        <button className="botao-nao" onClick={() => setShowConfirmarExclusao(false)}>Não</button>
+                        <button onClick={confirmarExclusao} disabled={loading}>{loading ? "Excluindo..." : "Sim, Excluir"}</button>
+                    </div>
+                </div>
             </div>
-          </div>
         )}
       </div>
     </PaginaBase>
