@@ -1,4 +1,4 @@
-// src/services/cursoService.js (VERSÃO ATUALIZADA)
+// src/services/cursoService.js
 
 import api from '../api/axios';
 import apiPrivate from '../api/apiPrivate';
@@ -17,17 +17,15 @@ const create = async (cursoData) => {
   return response.data;
 };
 
-// ================================================================
-// FUNÇÕES ADICIONADAS
-// ================================================================
+
 
 const update = async (cursoId, cursoData, coordenadorMatricula) => {
-    // O backend espera um DTO no corpo e os IDs/matrícula na URL
+    
     const payload = {
       nome: cursoData.nome,
       coordenador: { id: parseInt(cursoData.coordenadorId) }
     };
-    // Monta a URL complexa que o backend espera
+    // Montar a URL complexa que o backend espera
     const url = `/admin/curso/${cursoId}/professor/${coordenadorMatricula}`;
     const response = await apiPrivate.put(url, payload);
     return response.data;
@@ -42,8 +40,8 @@ const deleteById = async (cursoId) => {
 const cursoService = {
   getAll,
   create,
-  update,     // <-- Adicionado
-  deleteById, // <-- Adicionado
+  update,     
+  deleteById, 
 };
 
 export default cursoService;

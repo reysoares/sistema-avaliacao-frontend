@@ -8,19 +8,21 @@ import avaliacaoService from '../../services/avaliacaoService';
 import { useAuth } from '../../hooks/useAuth.js';
 import "@styles/Gerenciar.css";
 
-
 const PaginaDisciplinas = () => {
     const [disciplinas, setDisciplinas] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const { user } = useAuth(); // Pega o usuário logado do nosso contexto
+    const { user } = useAuth();
     
-    // Estados para o modal de avaliação
     const [showAvaliarModal, setShowAvaliarModal] = useState(false);
     const [disciplinaParaAvaliar, setDisciplinaParaAvaliar] = useState(null);
-    const [formData, setFormData] = useState({ notaConteudo: 3, notaCargaTrabalho: 3, notaInfraestrutura: 3, comentario: '' });
+    const [formData, setFormData] = useState({
+        notaConteudo: 3,
+        notaCargaTrabalho: 3,
+        notaInfraestrutura: 3,
+        comentario: ''
+    });
 
-    // Estados para o modal de visualização
     const [disciplinaSelecionada, setDisciplinaSelecionada] = useState(null);
     const [avaliacoesVisiveis, setAvaliacoesVisiveis] = useState([]);
     const [showVerModal, setShowVerModal] = useState(false);
@@ -32,8 +34,12 @@ const PaginaDisciplinas = () => {
                 const response = await disciplinaService.getAll();
                 setDisciplinas(response.content || []);
             } catch (err) {
-                console.error(err);
-                setError('Não foi possível carregar as disciplinas.');
+                if (err.response?.data?.message === 'Nenhuma disciplina encontrada.') {
+                    setDisciplinas([]);
+                } else {
+                    setError('Não foi possível carregar as disciplinas.');
+                    console.error(err);
+                }
             } finally {
                 setLoading(false);
             }
@@ -52,11 +58,17 @@ const PaginaDisciplinas = () => {
         if (!disciplinaParaAvaliar || !user) return;
         setLoading(true);
         setError('');
+
         const avaliacaoPayload = {
             aluno: { matriculaAcademica: user.usuario.matricula },
             disciplina: { codigo: disciplinaParaAvaliar.codigo },
-            ...formData
+            professor: { id: disciplinaParaAvaliar.professor.id },
+            notaConteudo: formData.notaConteudo,
+            notaCargaTrabalho: formData.notaCargaTrabalho,
+            notaInfraestrutura: formData.notaInfraestrutura,
+            comentario: formData.comentario
         };
+
         try {
             await avaliacaoService.criarAvaliacaoDisciplina(avaliacaoPayload);
             setShowAvaliarModal(false);
@@ -67,7 +79,7 @@ const PaginaDisciplinas = () => {
             setLoading(false);
         }
     };
-
+    
     const handleVerAvaliacoes = async () => {
         if (!disciplinaSelecionada) {
             alert("Selecione uma disciplina para ver as avaliações.");
@@ -88,12 +100,12 @@ const PaginaDisciplinas = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: parseInt(value, 10) || value }));
+        setFormData(prev => ({ ...prev, [name]: name === 'comentario' ? value : parseInt(value, 10) }));
     };
 
     return (
         <PaginaBase
-          botaoDireito={
+            botaoDireito={
                 <Link to="/inicial">
                     <button className="botao-navbar">Voltar</button>
                 </Link>
@@ -109,44 +121,45 @@ const PaginaDisciplinas = () => {
                 </div>
                 
                 {loading && <p>Carregando...</p>}
-                {error && <p style={{color: 'red', textAlign: 'center'}}>{error}</p>}
+                {error && !showAvaliarModal && !showVerModal && <p style={{color: 'red', textAlign: 'center'}}>{error}</p>}
 
                 <div className="tabela-cursos">
-                    {/* ... (código da tabela) ... */}
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Disciplina</th>
-                                <th>Professor</th>
-                                {user?.usuario.perfil === 'ALUNO' && <th>Ação</th>}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {disciplinas.map(d => (
-                                <tr key={d.codigo} 
-                                    className={disciplinaSelecionada?.codigo === d.codigo ? "linha-selecionada" : ""}
-                                    onClick={() => setDisciplinaSelecionada(d)}>
-                                    <td>{d.nome} ({d.codigo})</td>
-                                    <td>{d.professor?.nome || 'N/D'}</td>
-                                    {user?.usuario.perfil === 'ALUNO' && (
-                                        <td>
-                                            <button className='botao-editar' style={{margin: 0}} onClick={(e) => {e.stopPropagation(); handleAbrirAvaliarModal(d);}}>
-                                                Avaliar
-                                            </button>
-                                        </td>
-                                    )}
+                    {disciplinas.length === 0 && !loading ? (
+                        <p className="texto-vazio">Nenhuma disciplina disponível.</p>
+                    ) : (
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Disciplina</th>
+                                    <th>Professor</th>
+                                    {user?.usuario.perfil === 'ALUNO' && <th>Ação</th>}
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {disciplinas.map(d => (
+                                    <tr key={d.codigo} 
+                                        className={disciplinaSelecionada?.codigo === d.codigo ? "linha-selecionada" : ""}
+                                        onClick={() => setDisciplinaSelecionada(d)}>
+                                        <td>{d.nome} ({d.codigo})</td>
+                                        <td>{d.professor?.nome || 'N/D'}</td>
+                                        {user?.usuario.perfil === 'ALUNO' && (
+                                            <td>
+                                                <button className='botao-editar' style={{margin: 0}} onClick={(e) => {e.stopPropagation(); handleAbrirAvaliarModal(d);}}>
+                                                    Avaliar
+                                                </button>
+                                            </td>
+                                        )}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
                 </div>
 
-                {/* Modal de Avaliação (para Alunos) */}
                 {showAvaliarModal && (
                     <div className="modal-overlay">
-                        <div className="modal">
+                       <div className="modal">
                             <h2>Avaliar: {disciplinaParaAvaliar?.nome}</h2>
-
                             <div className="avaliacao-form">
                                 <div className="form-group">
                                     <div className="slider-label">
@@ -155,7 +168,6 @@ const PaginaDisciplinas = () => {
                                     </div>
                                     <input type="range" min="1" max="5" name="notaConteudo" value={formData.notaConteudo} onChange={handleChange} />
                                 </div>
-
                                 <div className="form-group">
                                     <div className="slider-label">
                                         <span>Nota para Carga de Trabalho (1-5):</span>
@@ -163,7 +175,6 @@ const PaginaDisciplinas = () => {
                                     </div>
                                     <input type="range" min="1" max="5" name="notaCargaTrabalho" value={formData.notaCargaTrabalho} onChange={handleChange} />
                                 </div>
-
                                 <div className="form-group">
                                     <div className="slider-label">
                                         <span>Nota para Infraestrutura (1-5):</span>
@@ -171,15 +182,12 @@ const PaginaDisciplinas = () => {
                                     </div>
                                     <input type="range" min="1" max="5" name="notaInfraestrutura" value={formData.notaInfraestrutura} onChange={handleChange} />
                                 </div>
-                                
                                 <div className="form-group">
                                     <label>Comentário:</label>
                                     <textarea name="comentario" value={formData.comentario} onChange={handleChange} rows="4" placeholder="Deixe um comentário construtivo..." />
                                 </div>
                             </div>
-
                             {error && <p style={{color: 'red'}}>{error}</p>}
-                            
                             <div className="modal-botoes">
                                 <button className="botao-nao" onClick={() => setShowAvaliarModal(false)}>Cancelar</button>
                                 <button onClick={handleSalvarAvaliacao} disabled={loading}>{loading ? 'Enviando...' : 'Enviar Avaliação'}</button>
@@ -188,7 +196,6 @@ const PaginaDisciplinas = () => {
                     </div>
                 )}
 
-                {/* Modal para Ver Avaliações */}
                 {showVerModal && (
                     <div className="modal-overlay">
                         <div className="modal" style={{maxWidth: '600px'}}>
@@ -209,7 +216,6 @@ const PaginaDisciplinas = () => {
                         </div>
                     </div>
                 )}
-
             </div>
         </PaginaBase>
     );

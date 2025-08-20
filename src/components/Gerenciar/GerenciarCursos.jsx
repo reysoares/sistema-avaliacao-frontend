@@ -20,32 +20,30 @@ const GerenciarCursos = () => {
 
   const [formData, setFormData] = useState({ nome: "", coordenadorId: "" });
 
-  // ================================================================
-  // FUNÇÃO DE CARREGAMENTO ATUALIZADA
-  // ================================================================
+  
   const carregarDados = async () => {
     setLoading(true);
     setError("");
     try {
-        // Passo 1: Carrega os professores primeiro. Se falhar, o formulário não funciona.
+        
         const resProfessores = await api.get("/public/professores");
         setProfessores(resProfessores.data.content || []);
 
-        // Passo 2: Carrega os cursos. Se a tabela estiver vazia, não é um erro fatal.
+      
         try {
             const resCursos = await cursoService.getAll();
             setCursos(resCursos.content || []);
         } catch (cursosError) {
-            // Se o erro for "Nenhum curso encontrado", é um estado normal, não um erro.
+            
             if (cursosError.response?.data?.message === 'Nenhum curso encontrado.') {
-                setCursos([]); // Apenas garante que a lista de cursos fique vazia.
+                setCursos([]); 
             } else {
-                throw cursosError; // Lança outros erros inesperados para o catch principal.
+                throw cursosError; 
             }
         }
 
     } catch (err) {
-        // Este catch agora irá capturar principalmente erros ao carregar professores.
+        
         setError("Falha ao carregar dados de suporte (professores). Tente atualizar a página.");
         console.error(err);
     } finally {

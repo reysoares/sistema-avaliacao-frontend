@@ -51,8 +51,6 @@ const PaginaInicial = () => {
         comunidade acadêmica!
       </p>
 
-      <h2 className="subtitulo-section">Disciplinas mais acessadas</h2>
-      <h2 className="subtitulo-section">Professores mais acessados</h2>
     </PaginaBase>
   );
 };
