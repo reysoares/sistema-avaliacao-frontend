@@ -7,7 +7,7 @@ import { AuthContext } from './AuthContext.js';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // <-- NOVO ESTADO DE LOADING
+  const [loading, setLoading] = useState(true); 
   const navigate = useNavigate();
 
   useEffect(() => {

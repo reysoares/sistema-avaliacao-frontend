@@ -14,7 +14,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { login } = useAuth(); // <-- Obtenha a função de login do contexto
+  const { login } = useAuth(); // <--  função de login do contexto
   
   const handleSubmit = async (event) => {
     event.preventDefault();

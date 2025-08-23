@@ -1,4 +1,4 @@
-// src/components/layouts/PaginaBase.jsx (VERSÃO 100% COMPLETA)
+// src/components/layouts/PaginaBase.jsx 
 
 import React from "react";
 import { Link, useLocation } from "react-router-dom";

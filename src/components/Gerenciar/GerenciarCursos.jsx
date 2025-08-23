@@ -1,4 +1,4 @@
-// src/components/Gerenciar/GerenciarCursos.jsx (VERSÃO FINAL COM LÓGICA DE CARREGAMENTO CORRIGIDA)
+// src/components/Gerenciar/GerenciarCursos.jsx 
 
 import React, { useState, useEffect } from "react";
 import PaginaBase from "../layouts/PaginaBase";
